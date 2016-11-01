@@ -1,5 +1,6 @@
 from bottle import run, route, get, post, request, redirect
 import webbrowser, pyaudio, wave
+import subprocess
 
 @route('/init')
 def init():
@@ -12,47 +13,11 @@ def init():
 
 @route('/play-music')
 def playMusic():
-    tempo = request.query.tempo
+    tempo = int(request.query.tempo)
 
-    # init chunk
-    CHUNK = 1024
+    dicMusic = {100:"https://open.spotify.com/track/0vFahN7YciXucZseX61eSa"}
 
-    # open wave file
-    wf = wave.open('Electro-punk.wav', 'rb')
+    return subprocess.check_output(['music.exe', dicMusic[100] ], shell=True)
 
-    # instantiate PyAudio (1)
-    p = pyaudio.PyAudio()
-
-    # open stream (2)
-    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
-                    channels=wf.getnchannels(),
-                    rate=wf.getframerate(),
-                    output=True)
-
-    # read data
-    data = wf.readframes(CHUNK)
-
-    print("I'm playing music!")
-    # play stream (3)
-    for i in range(200):
-        stream.write(data)
-        data = wf.readframes(CHUNK)
-
-    # stop stream (4)
-    stream.stop_stream()
-    stream.close()
-
-    # close PyAudio (5)
-    p.terminate()
-    print("Stop playing music")
-
-
-# def process(path):
-#     if path == "init":
-#         return subprocess.check_output(['python', 'init.py', ], shell=True)
-#     else:
-#         return subprocess.check_output(['python', path + '.py'], shell=True)
-
-
-run(host='localhost', port=8080, debug=True)
+run(host='localhost', port=80, debug=True)
 
